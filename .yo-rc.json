@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Aidan Harris",
+      "authorEmail": "mail@aidanharris.io",
+      "authorUrl": ""
+    }
+  }
+}

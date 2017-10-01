@@ -1,0 +1,47 @@
+# This is an example PKGBUILD file. Use this as a start to creating your own,
+# and remove these comments. For more information, see 'man PKGBUILD'.
+
+# Maintainer: <%- maintainer %>
+pkgname=<%- pkgname %>
+pkgver=<%- pkgver %>
+pkgrel=1
+epoch=
+pkgdesc=<%- description %>
+arch=<%- arch %>
+url=<%- url %>
+license=<%- license %>
+groups=()
+depends=<%- depends %>
+makedepends=<%- makedepends %>
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("$pkgname-$pkgver.tar.gz"
+        "$pkgname-$pkgver.patch")
+noextract=()
+md5sums=()
+validpgpkeys=()
+
+pkgver() {
+<%- pkgverfunc %>
+}
+
+prepare() {
+	#cd "$pkgname-$pkgver"
+	#patch -p1 -i "$srcdir/$pkgname-$pkgver.patch"
+	return 0
+}
+
+build() {
+<%- build %>
+}
+
+<%- check %>
+
+<%- package %>

@@ -1,0 +1,4 @@
+chroot-build:
+	sudo ./arch-pkgbuild-chroot.sh build
+chroot-shell:
+	sudo ./arch-pkgbuild-chroot.sh shell

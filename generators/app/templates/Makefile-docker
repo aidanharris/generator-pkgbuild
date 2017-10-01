@@ -1,0 +1,14 @@
+BASE_IMAGE?=base/archlinux
+IMAGE_NAME?=local/archlinux-makepkg
+SUDO?=sudo
+DOCKER?=docker
+UID=`id -u`
+# Set to "--no-cache" to invalidate the cache and force a re-build
+INVALIDATE_CACHE?=
+docker-build: docker-pullimage docker-makeimage docker-makepkg
+docker-pullimage:
+	$(SUDO) $(DOCKER) pull $(BASE_IMAGE)
+docker-makeimage:
+	$(SUDO) $(DOCKER) build $(INVALIDATE_CACHE) -t $(IMAGE_NAME) .
+docker-makepkg:
+	$(SUDO) $(DOCKER) run -it --rm -v "$(PWD):$(PWD)" -w "$(PWD)" -e UID="$(UID)" $(IMAGE_NAME)
