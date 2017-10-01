@@ -62,7 +62,7 @@ if [ "$1" = "build" ]
 then
   if [ "$RAMCACHE" -eq 1 ]
   then
-    makechrootpkg -c -d /mnt/ramcache/ccache:/ccache -r "$CHROOT" -- CCACHE_DIR=/ccache
+    makechrootpkg -c -d "$RAMCACHE_DRIVE/ccache":/ccache -r "$CHROOT" -- CCACHE_DIR=/ccache
   else
     makechrootpkg -c -r "$CHROOT"
   fi
