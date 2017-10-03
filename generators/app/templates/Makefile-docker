@@ -13,3 +13,5 @@ docker-makeimage:
 	$(SUDO) $(DOCKER) build $(INVALIDATE_CACHE) -t $(IMAGE_NAME) .
 docker-makepkg:
 	$(SUDO) $(DOCKER) run -it --rm -v "$(PWD):$(PWD)" -w "$(PWD)" -e UID="$(UID)" $(IMAGE_NAME)
+docker-shell:
+	$(SUDO) $(DOCKER) run -it --rm -v "$(PWD):$(PWD)" -w "$(PWD)" -e UID="$(UID)" $(IMAGE_NAME) entrypoint shell

@@ -384,12 +384,17 @@ check_python2-${props.name}() {
 
     if (this.options['with-docker'] === true || this.options['with-chroot'] === true) {
       let makefile_build_target;
+      let makefile_shell_target;
       if (this.options['with-docker'] && this.options['with-chroot']) {
         makefile_build_target = 'chroot-build';
+        makefile_shell_target = 'chroot-shell';
       } else {
         makefile_build_target = this.options['with-docker']
           ? 'docker-build'
           : 'chroot-build';
+        makefile_shell_target = this.options['with-docker']
+          ? 'docker-shell'
+          : 'chroot-shell';
       }
 
       let makefile_docker_target = '';
@@ -418,7 +423,12 @@ check_python2-${props.name}() {
       this.fs.copyTpl(
         this.templatePath('Makefile'),
         this.destinationPath(`${this.props.name}/Makefile`),
-        { makefile_build_target, makefile_chroot_target, makefile_docker_target }
+        {
+          makefile_build_target,
+          makefile_shell_target,
+          makefile_chroot_target,
+          makefile_docker_target
+        }
       );
 
       this.fs.copy(

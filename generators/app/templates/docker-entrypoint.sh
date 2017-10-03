@@ -26,4 +26,10 @@ pacman -S --needed --noconfirm base-devel sudo git
 useradd builduser -d "$PWD" -u "$UID" -U
 passwd -d builduser
 printf 'builduser ALL=(ALL) ALL\n' | tee -a /etc/sudoers
-sudo -u builduser bash -c 'cd ~ && makepkg -s --noconfirm'
+
+if [ "$1" = "shell" ]
+then
+  exec sudo -u builduser bash
+else
+  exec sudo -u builduser bash -c 'cd ~ && makepkg -s --noconfirm'
+fi
