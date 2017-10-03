@@ -10,10 +10,10 @@ script:
   - yarn link
   - cd /tmp
   - yarn global add yo
-  - $(yarn global bin)/yo pkgbuild \
-    test \
-      "--yes" \
-      "--with-chroot" \
+  - $(yarn global bin)/yo pkgbuild
+    test
+      "--yes"
+      "--with-chroot"
       "--with-docker"
   - cd test
   - make docker
