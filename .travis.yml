@@ -3,4 +3,19 @@ node_js:
   - 8.6.0 # latest
   - 6.11.3 # lts
 
-script: "yarn && yarn test && yarn link && cd /tmp && yarn global add yo && $(yarn global bin)/yo pkgbuild test --yes --with-chroot --with-docker && cd test && make docker && test -f test-0.0.0-1-x86_64.pkg.tar.xz && test $(ls -l test-0.0.0-1-x86_64.pkg.tar.xz | awk '{print $3}') = $USER"
+script:
+  - set -e
+  - yarn
+  - yarn test
+  - yarn link
+  - cd /tmp
+  - yarn global add yo
+  - $(yarn global bin)/yo pkgbuild \
+    test \
+      --yes \
+      --with-chroot \
+      --with-docker
+  - cd test
+  - make docker
+  - test -f test-0.0.0-1-x86_64.pkg.tar.xz
+  - test $(ls -l test-0.0.0-1-x86_64.pkg.tar.xz | awk '{print $3}') = $USER
