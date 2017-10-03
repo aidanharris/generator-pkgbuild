@@ -245,6 +245,12 @@ module.exports = class extends Generator {
         name: 'makedepends',
         message: 'Make Dependencies',
         default: ''
+      },
+      {
+        type: 'input',
+        name: 'source',
+        message: 'Sources',
+        default: ''
       }
     ];
 
@@ -362,6 +368,7 @@ check_python2-${props.name}() {
         case 'license':
         case 'depends':
         case 'makedepends':
+        case 'source':
           this.props[prop] = cleanArray(this.props[prop], true);
           break;
         default:

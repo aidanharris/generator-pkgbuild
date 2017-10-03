@@ -1,4 +1,6 @@
+CHROOT=$(HOME)/../chroot
+chroot: chroot-build
 chroot-build:
-	sudo ./arch-pkgbuild-chroot.sh build
+	sudo CHROOT=$(CHROOT) ./arch-pkgbuild-chroot.sh build
 chroot-shell:
-	sudo ./arch-pkgbuild-chroot.sh shell
+	sudo CHROOT=$(CHROOT) ./arch-pkgbuild-chroot.sh shell

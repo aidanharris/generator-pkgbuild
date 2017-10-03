@@ -5,6 +5,7 @@ DOCKER?=docker
 UID=`id -u`
 # Set to "--no-cache" to invalidate the cache and force a re-build
 INVALIDATE_CACHE?=
+docker: docker-build
 docker-build: docker-pullimage docker-makeimage docker-makepkg
 docker-pullimage:
 	$(SUDO) $(DOCKER) pull $(BASE_IMAGE)
