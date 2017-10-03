@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - 8.6.0 # latest
+  - 8.6.0  # latest
   - 6.11.3 # lts
 
 script:
