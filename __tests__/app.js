@@ -3,14 +3,19 @@ var path = require('path');
 var assert = require('yeoman-assert');
 var helpers = require('yeoman-test');
 
-describe('generator-pkgbuild:app', () => {
+describe('generator-pkgbuild:pkg', () => {
   beforeAll(() => {
     return helpers
       .run(path.join(__dirname, '../generators/app'))
-      .withPrompts({ someAnswer: true });
+      .withArguments(['pkg'])
+      .withPrompts({ yes: true });
   });
 
-  it('creates files', () => {
-    assert.file(['dummyfile.txt']);
+  it('creates PKGBUILD', () => {
+    assert.file(['pkg/PKGBUILD']);
+  });
+
+  it('initialises git repo', () => {
+    assert.file(['pkg/.git']);
   });
 });
