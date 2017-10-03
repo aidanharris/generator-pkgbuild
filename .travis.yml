@@ -3,4 +3,4 @@ node_js:
   - 8.6.0 # latest
   - 6.11.3 # lts
 
-script: "yarn && yarn test && yarn link && cd /tmp && yarn global add yo && ~/.yarn/bin/yo pkgbuild test --yes --with-chroot --with-docker && cd test && make docker"
+script: "yarn && yarn test && yarn link && cd /tmp && yarn global add yo && $(yarn global bin)/yo pkgbuild test --yes --with-chroot --with-docker && cd test && make docker"
