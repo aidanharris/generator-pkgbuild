@@ -82,6 +82,8 @@ const cleanArray = (str, stringify) => {
   return str;
 };
 
+let guidelinesText = [];
+
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
@@ -101,8 +103,9 @@ module.exports = class extends Generator {
     });
     this.option('package-type', {
       desc: `Package Type:
-\t[pyton] Python/Python2 split package
-\t[empty] Default PKGBUILD with supplied options\n\t`,
+\t[pyton]  Python/Python2 split package
+\t[nodejs] Node.js package
+\t[empty]  Default PKGBUILD with supplied options\n\t`,
       type: String,
       default: 'empty'
     });
@@ -169,7 +172,7 @@ module.exports = class extends Generator {
       )
     );
 
-    const prompts = [
+    let prompts = [
       {
         type: 'input',
         name: 'name',
@@ -244,7 +247,26 @@ module.exports = class extends Generator {
         type: 'input',
         name: 'makedepends',
         message: 'Make Dependencies',
-        default: ''
+        default: (answers = {}) => {
+          let makedeps = '';
+          if (this.options['package-type'] === 'python') {
+            makedeps += 'python python2 python-setuptools python2-setuptools ';
+          }
+
+          if (this.options['package-type'] === 'nodejs' && this.options.yes === true) {
+            answers.nodejspkgmgr = 'npm';
+          }
+
+          if (answers.nodejspkgmgr) {
+            makedeps += answers.nodejspkgmgr;
+          }
+
+          if (makedeps.endsWith(' ')) {
+            makedeps = makedeps.substring(0, makedeps.length - 1);
+          }
+
+          return makedeps;
+        }
       },
       {
         type: 'input',
@@ -256,12 +278,27 @@ module.exports = class extends Generator {
 
     switch (this.options['package-type']) {
       case 'python':
-        prompts[
+        guidelinesText.push(
+          'Python guidelines: https://wiki.archlinux.org/index.php/Python_package_guidelines'
+        );
+        break;
+      case 'nodejs':
+        guidelinesText.push(
+          'Node.js guidelines: https://wiki.archlinux.org/index.php/Node.js_package_guidelines'
+        );
+        prompts.splice(
           prompts.findIndex(e => {
             return e.name === 'makedepends';
-          })
-        ].default =
-          'python python2 python-setuptools python2-setuptools';
+          }),
+          0,
+          {
+            type: 'list',
+            name: 'nodejspkgmgr',
+            message: 'Nodejs package manager:',
+            choices: ['npm', 'yarn', 'none'],
+            default: 0
+          }
+        );
         break;
       default:
         break;
@@ -289,13 +326,16 @@ module.exports = class extends Generator {
     ).then(props => {
       switch (this.options['package-type']) {
         case 'python':
-          props.build = `	cp -r python-${props.name} python2-${props.name}
+          props.build = `build() {
+	cp -r python-${props.name} python2-${props.name}
 
 	cd python-${props.name}
 	python ./setup.py build
 
 	cd ../python2-${props.name}
-	python2 ./setup.py build`;
+	python2 ./setup.py build
+}`;
+
           props.package = `package_python-${props.name}() {
 	depends=${props.depends}
 
@@ -320,15 +360,55 @@ check_python2-${props.name}() {
 	return 0;
 }`;
         // eslint-disable-next-line no-fallthrough
+        case 'nodejs':
+          if (typeof props.build === 'undefined') {
+            props.build = '';
+          }
+          if (typeof props.package === 'undefined') {
+            props.package = `package() {
+	# cd $srcdir/$pkgname-$pkgver
+	# npm install -g --user root --prefix "$pkgdir"/usr
+	return 0
+}
+`;
+          }
+          if (typeof props.check === 'undefined') {
+            if (props.nodejspkgmgr === 'yarn') {
+              props.check = `check() {
+	# yarn test
+	return 0
+}`;
+            } else {
+              props.check = `check() {
+	# npm test
+	return 0
+}`;
+            }
+          }
+
+        // eslint-disable-next-line no-fallthrough
         default:
           if (!props.pkgname) {
             props.pkgname = props.name;
           }
-          if (!props.build) {
-            props.build = `	#cd "$pkgname-$pkgver"
+          if (typeof props.build === 'undefined') {
+            props.build = `build() {
+	#cd "$pkgname-$pkgver"
 	#./configure --prefix=/usr
 	#make
-	return 0`;
+	return 0
+}`;
+          }
+          if (
+            props.name.endsWith('-git') ||
+            props.name.endsWith('-svn') ||
+            props.name.endsWith('-bzr') ||
+            props.name.endsWith('-cvs') ||
+            props.name.endsWith('-hg')
+          ) {
+            guidelinesText.push(
+              'VCS guidelines: https://wiki.archlinux.org/index.php/VCS_package_guidelines'
+            );
           }
           if (props.name.endsWith('-git')) {
             props.pkgverfunc = `	cd "\${srcdir}/${props.name}"
@@ -336,14 +416,14 @@ check_python2-${props.name}() {
           } else {
             props.pkgverfunc = `	printf "%s" "$pkgver"`;
           }
-          if (!props.check) {
+          if (typeof props.check === 'undefined') {
             props.check = `check() {
 	#cd "${props.name}"
 	#make -k check
 	return 0
 }`;
           }
-          if (!props.package) {
+          if (typeof props.package === 'undefined') {
             props.package = `package() {
 	#cd "$pkgname-$pkgver"
 	#make DESTDIR="$pkgdir/" install
@@ -375,6 +455,17 @@ check_python2-${props.name}() {
           break;
       }
     });
+
+    if (guidelinesText.length === 0) {
+      this.props.guidelines = `
+`;
+    } else {
+      this.props.guidelines = '';
+      guidelinesText.forEach(el => {
+        this.props.guidelines += `# ${el}
+`;
+      });
+    }
 
     this.fs.copyTpl(
       this.templatePath('PKGBUILD.proto'),

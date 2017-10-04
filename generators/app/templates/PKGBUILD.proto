@@ -1,6 +1,6 @@
 # This is an example PKGBUILD file. Use this as a start to creating your own,
 # and remove these comments. For more information, see 'man PKGBUILD'.
-
+<%- guidelines %>
 # Maintainer: <%- maintainer %>
 pkgname=<%- pkgname %>
 pkgver=<%- pkgver %>
@@ -37,9 +37,7 @@ prepare() {
 	return 0
 }
 
-build() {
 <%- build %>
-}
 
 <%- check %>
 
